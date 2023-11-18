@@ -2,7 +2,8 @@ package response
 
 import (
 	"net/http"
-	"utility/wmwerrors"
+
+	"github.com/fxh111111/utility/wmwerrors"
 )
 
 type GinContext interface {
