@@ -4,28 +4,23 @@ import (
 	"context"
 	"time"
 
-	"github.com/fxh111111/utility/logger"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type mongoCli struct {
-	client *mongo.Client
-	logger logger.Logger
-}
+var client *mongo.Client
 
-func Set(uri string, logger logger.Logger) {
-	connect()
-}
-
-func connect() {
-	var err error
+func Connect(uri string) (err error) {
+	if uri == "" {
+		uri = "mongodb://localhost:27017"
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err = mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		logger.Default.Error(ctx, "mongo connection err", err)
+		return err
 	}
+	return nil
 }
 
 func GetMongoClient() *mongo.Client {

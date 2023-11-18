@@ -1,28 +1,35 @@
-package utility
+package jwt
 
 import (
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	jwt1 "github.com/golang-jwt/jwt/v5"
 )
 
-const (
-	key    = "this is my jwt key"
-	MaxAge = time.Hour
+var (
+	jwtKey = "this is my jwt key"
+	jwtAge = time.Hour
 )
 
 type myClaim struct {
-	jwt.RegisteredClaims
+	jwt1.RegisteredClaims
 	ID string `json:"id"`
 }
 
+func Set(key string, maxAge time.Duration) {
+	jwtKey = key
+	if maxAge > 0 {
+		jwtAge = maxAge
+	}
+}
+
 func SignAToken(id string) (token string, err error) {
-	t := jwt.NewWithClaims(jwt.SigningMethodHS256, &myClaim{
-		RegisteredClaims: jwt.RegisteredClaims{ExpiresAt: jwt.NewNumericDate(time.Now().Add(MaxAge))},
+	t := jwt1.NewWithClaims(jwt1.SigningMethodHS256, &myClaim{
+		RegisteredClaims: jwt1.RegisteredClaims{ExpiresAt: jwt1.NewNumericDate(time.Now().Add(jwtAge))},
 		ID:               id,
 	})
-	token, err = t.SignedString([]byte(key))
+	token, err = t.SignedString([]byte(jwtKey))
 	if err != nil {
 		return "", err
 	}
@@ -30,9 +37,9 @@ func SignAToken(id string) (token string, err error) {
 }
 
 func ParseToken(token string) (id string, err error) {
-	var t *jwt.Token
-	t, err = jwt.ParseWithClaims(token, &myClaim{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(key), nil
+	var t *jwt1.Token
+	t, err = jwt1.ParseWithClaims(token, &myClaim{}, func(token *jwt1.Token) (interface{}, error) {
+		return []byte(jwtKey), nil
 	})
 	if err != nil {
 		return "", err
