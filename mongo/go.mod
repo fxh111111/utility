@@ -1,4 +1,4 @@
-module utility/mongo
+module github.com/fxh111111/utility/mongo
 
 go 1.21.4
 
